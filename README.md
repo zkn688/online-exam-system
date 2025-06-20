@@ -13,6 +13,7 @@
 - Spring Security
 - Redis
 - MySQL
+- Docker
 
 ## 功能特点
 
@@ -30,6 +31,7 @@
 - Maven 3.6+
 - MySQL 5.7+
 - Redis
+- Docker & Docker Compose (用于容器化部署)
 
 ### 数据库配置
 
@@ -55,9 +57,32 @@ spring:
 
 ### 运行项目
 
+#### 方式一：直接运行
+
 ```bash
 cd bank-admin
 mvn spring-boot:run
+```
+
+#### 方式二：Docker部署
+
+使用Docker Compose一键部署（包含MySQL和Redis）：
+
+```bash
+# 构建并启动所有服务
+docker-compose up -d
+
+# 查看服务状态
+docker-compose ps
+
+# 查看应用日志
+docker-compose logs -f app
+```
+
+或者使用部署脚本：
+
+```bash
+./deploy.sh
 ```
 
 ## API文档
@@ -81,6 +106,7 @@ mvn spring-boot:run
 1. 代码构建和测试
 2. 数据库集成测试
 3. 代码质量检查
+4. Docker镜像构建和发布
 
 ## 联系方式
 

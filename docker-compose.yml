@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./bank-admin
+      dockerfile: Dockerfile
+    container_name: exam-system-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/bank?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - WAIT_HOSTS=mysql:3306,redis:6379
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=5
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - exam-network
+
+  mysql:
+    image: mysql:5.7
+    container_name: exam-system-mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=bank
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./bank-admin/bank.sql:/docker-entrypoint-initdb.d/bank.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    networks:
+      - exam-network
+
+  redis:
+    image: redis:6
+    container_name: exam-system-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - exam-network
+
+volumes:
+  mysql-data:
+  redis-data:
+
+
+networks:
+  exam-network:
+    driver: bridge
