@@ -1,0 +1,26 @@
+server:
+  port: 9001
+  max-http-header-size: 32KB
+
+spring:
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      # 最大文件大小
+      max-file-size: 10MB
+      # 最大请求大小
+      max-request-size: 10MB
+  # json序列化date类型时候防止出现 T
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.java.bank.entity
+# 关闭SQL日志
+#  configuration:
+    # 配置日志.
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+

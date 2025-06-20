@@ -1,0 +1,24 @@
+server:
+  port: 9001
+
+spring:
+  redis:
+    port: 6379
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/bank?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+
+# 令牌自定义标识
+token:
+  header: authorization
+  # 令牌秘钥
+  secret: abcdefghijklmnopqrstuvwxyz
+  # 令牌有效期（默认30分钟）
+  expireTime: 100
+
+# 图片存储地址
+file:
+  imgPath: E:\项目\项目源码\《7》基于springboot+vue的在线考试系统\源代码\源代码\bank-admin\upload\
