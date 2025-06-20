@@ -64,6 +64,24 @@ mvn spring-boot:run
 
 启动项目后，访问 `http://localhost:8080/swagger-ui.html` 查看API文档。
 
+## 开发环境配置
+
+为保证团队开发的一致性，我们提供了标准的开发环境配置：
+
+1. **代码风格**: 项目使用EditorConfig和Checkstyle统一代码风格
+2. **IDE支持**: 提供了IntelliJ IDEA和VSCode的配置文件
+3. **代码质量**: 集成了SpotBugs和PMD等代码质量检查工具
+
+详细的配置说明请查看 [开发环境配置指南](./开发环境配置.md)
+
+## CI/CD
+
+项目集成了GitHub Actions进行持续集成，自动执行以下任务：
+
+1. 代码构建和测试
+2. 数据库集成测试
+3. 代码质量检查
+
 ## 联系方式
 
 GitHub: [zkn688](https://github.com/zkn688) 
