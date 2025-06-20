@@ -1,0 +1,24 @@
+{
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "java.format.settings.url": ".vscode/java-formatter.xml",
+    "java.format.settings.profile": "ProjectFormat",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "editor.tabSize": 4,
+    "editor.detectIndentation": false,
+    "editor.insertSpaces": true,
+    "files.eol": "\n",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.saveActions.organizeImports": true,
+    "java.cleanup.actionsOnSave": [
+        "qualifyMembers",
+        "qualifyStaticMembers",
+        "addOverride",
+        "stringConcatToTextBlock",
+        "invertEquals"
+    ],
+    "java.checkstyle.configuration": "${workspaceFolder}/bank-admin/checkstyle.xml",
+    "java.checkstyle.version": "8.44"
+}
