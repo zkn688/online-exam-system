@@ -8,7 +8,7 @@ services:
     container_name: exam-system-backend
     restart: always
     ports:
-      - "8080:8080"
+      - "9001:9001"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/bank?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
       - SPRING_DATASOURCE_USERNAME=root
@@ -19,6 +19,12 @@ services:
       - WAIT_HOSTS_TIMEOUT=300
       - WAIT_SLEEP_INTERVAL=5
       - WAIT_HOST_CONNECT_TIMEOUT=30
+      - FILE_IMGPATH=/app/upload/
+      - SERVER_PORT=9001
+      - SERVER_ADDRESS=0.0.0.0
+      - CORS_ALLOWED_ORIGINS=*
+    volumes:
+      - app-upload:/app/upload
     depends_on:
       - mysql
       - redis
@@ -33,7 +39,7 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=bank
     ports:
-      - "3306:3306"
+      - "13306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
       - ./bank-admin/bank.sql:/docker-entrypoint-initdb.d/bank.sql
@@ -55,6 +61,7 @@ services:
 volumes:
   mysql-data:
   redis-data:
+  app-upload:
 
 
 networks:

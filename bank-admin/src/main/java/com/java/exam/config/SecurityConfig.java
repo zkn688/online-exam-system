@@ -1,7 +1,5 @@
 package com.java.exam.config;
 
-import com.java.exam.security.filter.JwtAuthenticationTokenFilter;
-import com.java.exam.security.handle.AuthenticationEntryPointImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,12 +11,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
+
+import com.java.exam.security.filter.JwtAuthenticationTokenFilter;
+import com.java.exam.security.handle.AuthenticationEntryPointImpl;
 
 /**
  * spring security配置
  */
-@Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@Configuration @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
@@ -30,61 +31,54 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
+    @Autowired
+    private CorsFilter corsFilter;
 
     /**
      * 强散列哈希加密实现
      */
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder()
-    {
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     /**
      * 解决 无法直接注入 AuthenticationManager
      */
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception
-    {
+    @Bean @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
-
     /**
-     * anyRequest          |   匹配所有请求路径
-     * access              |   SpringEl表达式结果为true时可以访问
-     * anonymous           |   匿名可以访问
-     * denyAll             |   用户不能访问
-     * fullyAuthenticated  |   用户完全认证可以访问（非remember-me下自动登录）
-     * hasAnyAuthority     |   如果有参数，参数表示权限，则其中任何一个权限可以访问
-     * hasAnyRole          |   如果有参数，参数表示角色，则其中任何一个角色可以访问
-     * hasAuthority        |   如果有参数，参数表示权限，则其权限可以访问
-     * hasIpAddress        |   如果有参数，参数表示IP地址，如果用户IP和参数匹配，则可以访问
-     * hasRole             |   如果有参数，参数表示角色，则其角色可以访问
-     * permitAll           |   用户可以任意访问
-     * rememberMe          |   允许通过remember-me登录的用户访问
-     * authenticated       |   用户登录后可访问
+     * anyRequest | 匹配所有请求路径 access | SpringEl表达式结果为true时可以访问 anonymous | 匿名可以访问
+     * denyAll | 用户不能访问 fullyAuthenticated | 用户完全认证可以访问（非remember-me下自动登录）
+     * hasAnyAuthority | 如果有参数，参数表示权限，则其中任何一个权限可以访问 hasAnyRole |
+     * 如果有参数，参数表示角色，则其中任何一个角色可以访问 hasAuthority | 如果有参数，参数表示权限，则其权限可以访问 hasIpAddress
+     * | 如果有参数，参数表示IP地址，如果用户IP和参数匹配，则可以访问 hasRole | 如果有参数，参数表示角色，则其角色可以访问 permitAll
+     * | 用户可以任意访问 rememberMe | 允许通过remember-me登录的用户访问 authenticated | 用户登录后可访问
      */
     @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception
-    {
+    protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                // 添加CORS过滤器
+                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+                // 允许跨域
+                .cors().and()
+                // CSRF禁用，因为不使用session
+                .csrf().disable()
                 // 过滤请求
-                .authorizeRequests()
-                .mvcMatchers("/public/**").hasAnyAuthority("student", "teacher", "admin")
-                .mvcMatchers("/student/**").hasAnyAuthority("student", "admin", "teacher")
-                .mvcMatchers("/teacher/**").hasAnyAuthority("teacher", "admin")
-                .mvcMatchers("/admin/**").hasAnyAuthority("admin")
-                // 配合下面的web.ignore 将下面所有的路径的校验都过滤掉了
+                .authorizeRequests().mvcMatchers("/public/**").hasAnyAuthority("student", "teacher", "admin")
+                .mvcMatchers("/student/**").hasAnyAuthority("student", "admin", "teacher").mvcMatchers("/teacher/**")
+                .hasAnyAuthority("teacher", "admin").mvcMatchers("/admin/**").hasAnyAuthority("admin")
+                // 对于登录接口 允许匿名访问
                 .mvcMatchers("/util/**", "/common/**", "/actuator/**", "/api/**").permitAll()
                 // 除上面外的所有请求全部需要鉴权认证
                 .anyRequest().authenticated().and()
-                // token
+                // token认证过滤器
                 .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 // 认证失败处理类
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
-                .and()
-                .csrf().disable();// 默认csrf token 校验开启，针对 POST, PUT, PATCH
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler);
 
         httpSecurity.formLogin().disable();
         // 前后端分离关闭配置登录
@@ -94,14 +88,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
-
-
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring()
-                .antMatchers("/util/**", "/common/**")
-                .antMatchers("/actuator/**")
-                .antMatchers("/api/**")
+        web.ignoring().antMatchers("/util/**", "/common/**").antMatchers("/actuator/**").antMatchers("/api/**")
                 .antMatchers("/swagger/**", "/webjars/**", "/v2/**");
     }
 }
